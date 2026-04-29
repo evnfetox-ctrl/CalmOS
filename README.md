@@ -2,12 +2,18 @@
 
 CalmOS is a private, empathetic emotional wellness companion built with Next.js 15, Genkit, and ShadCN UI. It helps users manage intense emotions through breathing exercises, reflections, and AI-powered counseling.
 
+Live Demo: [https://calm-os.vercel.app/](https://calm-os.vercel.app/)
+
 ## Key Features
 
+- **Onboarding Tour**: A friendly introduction for first-time users to help them get started.
 - **Breathing Guide**: Interactive visual breathing exercises to regain center.
-- **Dynamic Reflections**: Log emotional triggers and reactions privately.
+- **Dynamic Reflections**: Log emotional triggers and reactions privately to build resilience.
 - **AI Insights**: Personalized analysis of emotional patterns using a unified AI router.
+- **AI Counselor**: A supportive chat interface that uses your personal profile context for tailored advice.
+- **Deep Personalization**: Define your goals, triggers, and coping methods to improve AI accuracy.
 - **Local-First Privacy**: All logs, chats, and profile data are stored exclusively in your browser's IndexedDB.
+- **Data Management**: Export your entire history as JSON or import data from other devices.
 - **AI Fallback System**: Reliable AI responses with automatic fallback between OpenRouter and Groq.
 
 ## Tech Stack
@@ -32,6 +38,7 @@ CalmOS is a private, empathetic emotional wellness companion built with Next.js 
    AI_PROVIDER=openrouter
    OPENROUTER_API_KEY=your_openrouter_key
    GROQ_API_KEY=your_groq_key
+   NEXT_PUBLIC_APP_URL=https://calm-os.vercel.app/
    ```
 
 3. **Run Development Server**:

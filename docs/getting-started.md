@@ -20,6 +20,7 @@ Follow these steps to set up the development environment for CalmOS.
    AI_PROVIDER=openrouter
    OPENROUTER_API_KEY=sk-or-v1-your-key-here
    GROQ_API_KEY=gsk_your-key-here
+   NEXT_PUBLIC_APP_URL=http://localhost:9002
    ```
 
 ## Development Workflow
@@ -43,4 +44,5 @@ This opens the Genkit UI where you can trigger flows manually with custom inputs
 - `src/app`: Next.js pages and layouts.
 - `src/ai/flows`: Genkit logic for AI processing.
 - `src/lib`: Core utilities including the Database (IndexedDB) and AI Router.
+- `src/components`: UI components including the Onboarding Tour.
 - `src/components/ui`: Reusable UI components powered by ShadCN.

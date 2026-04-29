@@ -17,3 +17,6 @@ CalmOS utilizes a custom, unified AI router located in `src/lib/ai-router.ts`. T
 ## Implementation Detail
 
 The router is used by the Genkit flows located in `src/ai/flows/`. Instead of calling a model directly via Genkit's `ai.generate`, the flows use the `aiRouterRequest` utility to handle the provider logic and fallback.
+
+### Context Injection
+For the chat counselor, the router also incorporates data from the `user_profile` store to ensure responses are personalized to the user's specific goals and triggers.

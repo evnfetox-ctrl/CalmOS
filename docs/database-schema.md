@@ -12,7 +12,7 @@ Stores the user's emotional reflections.
 - **Fields**:
   - `id`: string (UUID)
   - `timestamp`: number (ms)
-  - `trigger`: string (e.g., "Mistake", "Argument")
+  - `trigger`: string (e.g., "Delay", "Mistake")
   - `reacted`: boolean (Did the user react immediately?)
 
 ### 2. `chat_messages`
@@ -25,12 +25,16 @@ Stores the conversation history with the AI Counselor.
   - `timestamp`: number (ms)
 
 ### 3. `user_profile`
-Stores user personalization data.
+Stores user personalization data and application state.
 - **Key**: `current_user`
 - **Fields**:
   - `name`: string
-  - `goals`: string
-  - `preferences`: string
+  - `ageGroup`: string (e.g., "young-adult", "adult")
+  - `goals`: string (User wellness objectives)
+  - `triggers`: string (Known emotional triggers)
+  - `copingMethods`: string (Existing helpful strategies)
+  - `preferences`: string (Communication tone preference)
+  - `hasSeenTour`: boolean (Flag for onboarding tour)
 
 ## Data Portability
 
