@@ -24,10 +24,10 @@ export default function ChatPage() {
         const history = await getChatHistory();
         if (history.length === 0) {
           const profile = await getProfile();
-          const name = profile?.name || 'there';
+          const name = profile?.name || 'friend';
           const welcomeMsg: ChatMessage = {
             id: 'welcome',
-            text: `Good morning, ${name}. I'm here to support you. How are you feeling right now?`,
+            text: `Hi ${name}, I'm here to listen. How are you feeling in this moment?`,
             sender: 'ai',
             timestamp: Date.now()
           };
@@ -69,7 +69,18 @@ export default function ChatPage() {
     try {
       await saveChatMessage(userMsg);
       const profile = await getProfile();
-      const context = profile ? `User Name: ${profile.name}\nGoals: ${profile.goals}\nPreferences: ${profile.preferences}` : '';
+      
+      let context = '';
+      if (profile) {
+        context = `
+          Name: ${profile.name}
+          Age Group: ${profile.ageGroup}
+          Goals: ${profile.goals}
+          Triggers: ${profile.triggers}
+          Existing Coping Methods: ${profile.copingMethods}
+          Tone Preference: ${profile.preferences}
+        `.trim();
+      }
       
       const response = await aiChatCounselor({ 
         message: messageText,
@@ -87,7 +98,7 @@ export default function ChatPage() {
     } catch (err) {
       const errorMsg: ChatMessage = { 
         id: crypto.randomUUID(), 
-        text: "I'm having a little trouble connecting. Let's take a deep breath together.", 
+        text: "I'm having a brief connection issue. Let's try taking a slow breath together while I reconnect.", 
         sender: 'ai', 
         timestamp: Date.now() 
       };
@@ -183,7 +194,7 @@ export default function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Message..."
+            placeholder="Type your message..."
             className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] text-slate-800 placeholder:text-slate-400 h-10 outline-none"
           />
           <Button

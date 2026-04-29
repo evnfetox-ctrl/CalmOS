@@ -14,7 +14,10 @@ export interface ChatMessage {
 
 export interface UserProfile {
   name: string;
+  ageGroup?: string;
   goals: string;
+  triggers?: string;
+  copingMethods?: string;
   preferences: string;
 }
 

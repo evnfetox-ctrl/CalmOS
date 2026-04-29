@@ -25,9 +25,18 @@ const aiChatCounselorFlow = ai.defineFlow(
     outputSchema: AIChatCounselorOutputSchema,
   },
   async (input) => {
-    const systemPrompt = `You are a supportive emotional counselor. Reflect emotion, validate feelings, and ask 1 gentle question. 
-    Keep response short (2-3 lines). 
-    ${input.profileContext ? `\n\nUser Profile Context:\n${input.profileContext}` : ''}`;
+    const systemPrompt = `You are a supportive emotional wellness counselor. Your tone should be empathetic, validating, and helpful.
+    
+    CRITICAL INSTRUCTIONS:
+    - Keep responses concise (2-4 sentences max).
+    - Always validate the user's feelings before offering advice.
+    - Ask exactly ONE gentle follow-up question.
+    - Tailor your language to the user's age and preferences if provided.
+    
+    User Profile Context:
+    ${input.profileContext || 'No profile data provided yet.'}
+    
+    Roleplay as the counselor now.`;
 
     const response = await aiRouterRequest({
       system: systemPrompt,

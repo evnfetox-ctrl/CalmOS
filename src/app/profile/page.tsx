@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -8,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { 
   getProfile, 
@@ -21,7 +21,10 @@ import {
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile>({
     name: '',
+    ageGroup: '',
     goals: '',
+    triggers: '',
+    copingMethods: '',
     preferences: ''
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +94,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-32">
-      <header className="px-6 pt-6 pb-2 flex justify-between items-center">
+      <header className="px-6 pt-6 pb-2 flex justify-between items-center bg-white sticky top-0 z-20">
         <Button variant="ghost" size="icon" className="text-muted-foreground">
           <Menu className="w-6 h-6" />
         </Button>
@@ -103,98 +106,148 @@ export default function ProfilePage() {
 
       <main className="flex-1 px-6 pt-6 space-y-8 max-w-lg mx-auto w-full">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold text-slate-800">Settings</h2>
-          <p className="text-slate-500 text-sm">Personalize your AI wellness experience.</p>
+          <h2 className="text-3xl font-bold text-slate-800">Your Profile</h2>
+          <p className="text-slate-500 text-sm">The more I know, the better I can support you.</p>
         </div>
 
         {/* Profile Info */}
-        <section className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-xs font-bold uppercase text-slate-400 tracking-widest">Display Name</Label>
-            <Input 
-              id="name"
-              placeholder="How should I address you?"
-              value={profile.name}
-              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-              className="rounded-[16px] border-slate-100 bg-slate-50/50"
-            />
-          </div>
+        <section className="space-y-8">
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Name</Label>
+                <Input 
+                  id="name"
+                  placeholder="Address me as..."
+                  value={profile.name}
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  className="rounded-[16px] border-slate-100 bg-slate-50/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="age" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Age Group</Label>
+                <Select 
+                  value={profile.ageGroup} 
+                  onValueChange={(val) => setProfile({...profile, ageGroup: val})}
+                >
+                  <SelectTrigger className="rounded-[16px] border-slate-100 bg-slate-50/50">
+                    <SelectValue placeholder="Select..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="teen">Teen (13-19)</SelectItem>
+                    <SelectItem value="young-adult">Young Adult (20-29)</SelectItem>
+                    <SelectItem value="adult">Adult (30-59)</SelectItem>
+                    <SelectItem value="senior">Senior (60+)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="goals" className="text-xs font-bold uppercase text-slate-400 tracking-widest">Wellness Goals</Label>
-            <Textarea 
-              id="goals"
-              placeholder="e.g., Build resilience, manage stress at work..."
-              value={profile.goals}
-              onChange={(e) => setProfile({ ...profile, goals: e.target.value })}
-              className="rounded-[16px] border-slate-100 bg-slate-50/50 min-h-[100px]"
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="goals" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Wellness Goals</Label>
+              <Textarea 
+                id="goals"
+                placeholder="What are you hoping to achieve? (e.g., manage work stress, be more patient...)"
+                value={profile.goals}
+                onChange={(e) => setProfile({ ...profile, goals: e.target.value })}
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="prefs" className="text-xs font-bold uppercase text-slate-400 tracking-widest">Communication Preference</Label>
-            <Textarea 
-              id="prefs"
-              placeholder="e.g., Be direct, focus on breathing techniques, use gentle tone..."
-              value={profile.preferences}
-              onChange={(e) => setProfile({ ...profile, preferences: e.target.value })}
-              className="rounded-[16px] border-slate-100 bg-slate-50/50 min-h-[100px]"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="triggers" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Typical Triggers</Label>
+              <Textarea 
+                id="triggers"
+                placeholder="What usually causes intense emotions for you?"
+                value={profile.triggers}
+                onChange={(e) => setProfile({ ...profile, triggers: e.target.value })}
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="coping" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Current Coping Methods</Label>
+              <Textarea 
+                id="coping"
+                placeholder="What do you already do that helps? (e.g., walking, breathing...)"
+                value={profile.copingMethods}
+                onChange={(e) => setProfile({ ...profile, copingMethods: e.target.value })}
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="prefs" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Communication Tone</Label>
+              <Textarea 
+                id="prefs"
+                placeholder="How should I talk to you? (e.g., gentle, direct, clinical, friendly...)"
+                value={profile.preferences}
+                onChange={(e) => setProfile({ ...profile, preferences: e.target.value })}
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+              />
+            </div>
           </div>
 
           <Button 
             onClick={handleSave}
-            className="w-full py-6 rounded-[20px] bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20"
+            className="w-full py-7 rounded-[24px] bg-primary hover:bg-primary/90 font-bold shadow-xl shadow-primary/20 text-lg transition-all active:scale-95"
           >
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-5 h-5 mr-2" />
             Save Profile
           </Button>
         </section>
 
         {/* Data Management */}
-        <section className="pt-8 space-y-4">
-          <h3 className="text-xs font-bold uppercase text-slate-400 tracking-widest">Data & Privacy</h3>
+        <section className="pt-8 space-y-6">
+          <h3 className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Security & Privacy</h3>
           
           <div className="grid grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
-              onClick={handleExport}
-              className="rounded-[20px] py-6 border-slate-100 hover:bg-slate-50 text-slate-600"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export JSON
-            </Button>
+            <Card className="p-4 border-slate-100 bg-slate-50/30 flex flex-col items-center justify-center space-y-3 rounded-[24px]">
+              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                <Download className="w-5 h-5 text-blue-500" />
+              </div>
+              <Button 
+                variant="ghost" 
+                onClick={handleExport}
+                className="text-xs font-bold text-slate-600 p-0 h-auto"
+              >
+                Export JSON
+              </Button>
+            </Card>
             
-            <Button 
-              variant="outline" 
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-[20px] py-6 border-slate-100 hover:bg-slate-50 text-slate-600"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Import Data
-            </Button>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              accept=".json" 
-              onChange={handleImport} 
-            />
+            <Card className="p-4 border-slate-100 bg-slate-50/30 flex flex-col items-center justify-center space-y-3 rounded-[24px]">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                <Upload className="w-5 h-5 text-emerald-500" />
+              </div>
+              <Button 
+                variant="ghost" 
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs font-bold text-slate-600 p-0 h-auto"
+              >
+                Import Data
+              </Button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept=".json" 
+                onChange={handleImport} 
+              />
+            </Card>
           </div>
 
           <Button 
             variant="ghost" 
             onClick={handleClear}
-            className="w-full py-6 rounded-[20px] text-red-500 hover:text-red-600 hover:bg-red-50 font-bold"
+            className="w-full py-6 rounded-[24px] text-red-500 hover:text-red-600 hover:bg-red-50 font-bold border border-transparent hover:border-red-100"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Clear All Local Data
+            Delete All Data
           </Button>
         </section>
 
-        <p className="text-center text-[10px] text-slate-400 leading-relaxed px-4">
-          Your data is stored securely in your browser's IndexedDB. 
-          CalmOS does not store your private logs on its servers.
+        <p className="text-center text-[10px] text-slate-400 leading-relaxed px-8 pb-10">
+          Your data is yours. It's stored locally in your browser and never leaves this device unless you export it.
         </p>
       </main>
     </div>
