@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ClipboardList, BarChart2, MessageCircle } from 'lucide-react';
+import { Home, ClipboardList, BarChart2, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Navigation() {
@@ -13,6 +13,7 @@ export function Navigation() {
     { label: 'Reflect', icon: ClipboardList, href: '/reflect' },
     { label: 'Insights', icon: BarChart2, href: '/insights' },
     { label: 'Chat', icon: MessageCircle, href: '/chat' },
+    { label: 'Profile', icon: User, href: '/profile' },
   ];
 
   return (

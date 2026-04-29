@@ -2,13 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { aiChatCounselor } from '@/ai/flows/chat-counselor-flow';
-import { saveChatMessage, getChatHistory, ChatMessage } from '@/lib/db';
+import { saveChatMessage, getChatHistory, ChatMessage, getProfile } from '@/lib/db';
 import { Menu, User, Plus, ArrowUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export default function ChatPage() {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -21,9 +23,11 @@ export default function ChatPage() {
       try {
         const history = await getChatHistory();
         if (history.length === 0) {
+          const profile = await getProfile();
+          const name = profile?.name || 'there';
           const welcomeMsg: ChatMessage = {
             id: 'welcome',
-            text: "Good morning. I'm here to support you. How are you feeling right now?",
+            text: `Good morning, ${name}. I'm here to support you. How are you feeling right now?`,
             sender: 'ai',
             timestamp: Date.now()
           };
@@ -64,7 +68,14 @@ export default function ChatPage() {
 
     try {
       await saveChatMessage(userMsg);
-      const response = await aiChatCounselor(messageText);
+      const profile = await getProfile();
+      const context = profile ? `User Name: ${profile.name}\nGoals: ${profile.goals}\nPreferences: ${profile.preferences}` : '';
+      
+      const response = await aiChatCounselor({ 
+        message: messageText,
+        profileContext: context
+      });
+
       const aiMsg: ChatMessage = { 
         id: crypto.randomUUID(), 
         text: response, 
@@ -95,7 +106,12 @@ export default function ChatPage() {
           <Menu className="w-6 h-6" />
         </Button>
         <h1 className="text-primary font-bold text-lg tracking-tight">CalmOS</h1>
-        <Button variant="ghost" size="icon" className="text-slate-300">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-slate-300"
+          onClick={() => router.push('/profile')}
+        >
           <User className="w-6 h-6" />
         </Button>
       </header>
