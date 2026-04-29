@@ -5,9 +5,17 @@ export interface AngerLog {
   reacted: boolean;
 }
 
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: number;
+}
+
 const DB_NAME = 'calmOS_db';
-const STORE_NAME = 'anger_logs';
-const DB_VERSION = 1;
+const LOGS_STORE = 'anger_logs';
+const CHAT_STORE = 'chat_messages';
+const DB_VERSION = 2;
 
 export async function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -18,20 +26,23 @@ export async function openDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      if (!db.objectStoreNames.contains(LOGS_STORE)) {
+        db.createObjectStore(LOGS_STORE, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(CHAT_STORE)) {
+        db.createObjectStore(CHAT_STORE, { keyPath: 'id' });
       }
     };
   });
 }
 
+// Anger Logs Functions
 export async function saveLog(log: AngerLog): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
+    const transaction = db.transaction(LOGS_STORE, 'readwrite');
+    const store = transaction.objectStore(LOGS_STORE);
     const request = store.add(log);
-
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
@@ -40,23 +51,47 @@ export async function saveLog(log: AngerLog): Promise<void> {
 export async function getLogs(): Promise<AngerLog[]> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
+    const transaction = db.transaction(LOGS_STORE, 'readonly');
+    const store = transaction.objectStore(LOGS_STORE);
     const request = store.getAll();
-
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 }
 
-export async function clearLogs(): Promise<void> {
+// Chat Functions
+export async function saveChatMessage(message: ChatMessage): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.clear();
-
+    const transaction = db.transaction(CHAT_STORE, 'readwrite');
+    const store = transaction.objectStore(CHAT_STORE);
+    const request = store.add(message);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
+  });
+}
+
+export async function getChatHistory(): Promise<ChatMessage[]> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(CHAT_STORE, 'readonly');
+    const store = transaction.objectStore(CHAT_STORE);
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const results = request.result as ChatMessage[];
+      resolve(results.sort((a, b) => a.timestamp - b.timestamp));
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+export async function clearAllData(): Promise<void> {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([LOGS_STORE, CHAT_STORE], 'readwrite');
+    transaction.objectStore(LOGS_STORE).clear();
+    transaction.objectStore(CHAT_STORE).clear();
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
   });
 }

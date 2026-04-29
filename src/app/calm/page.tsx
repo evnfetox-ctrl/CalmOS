@@ -2,21 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Menu, User } from 'lucide-react';
+import { Menu, User, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { realtimeCalmingResponse } from '@/ai/flows/realtime-calming-response-flow';
 
 export default function CalmPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<'Inhale' | 'Hold' | 'Exhale'>('Inhale');
+  const [aiMessage, setAiMessage] = useState<string>('');
+  const [loadingAi, setLoadingAi] = useState(true);
 
   useEffect(() => {
+    // Breathing Cycle Logic
     const phases: ('Inhale' | 'Hold' | 'Exhale')[] = ['Inhale', 'Hold', 'Exhale'];
     let current = 0;
     const interval = setInterval(() => {
       current = (current + 1) % phases.length;
       setPhase(phases[current]);
     }, 4000);
+
+    // Fetch Dynamic Calming AI Message
+    async function fetchCalmResponse() {
+      try {
+        const { response } = await realtimeCalmingResponse({ 
+          trigger: "general stress and intense emotion" 
+        });
+        setAiMessage(response);
+      } catch (err) {
+        setAiMessage("Let's focus on your breath. It's the most powerful way to return to center.");
+      } finally {
+        setLoadingAi(false);
+      }
+    }
+    fetchCalmResponse();
 
     return () => clearInterval(interval);
   }, []);
@@ -44,25 +63,34 @@ export default function CalmPage() {
           <div className="w-1/3 h-1/3 bg-primary rounded-full shadow-2xl z-10 animate-breathe-core" />
         </div>
 
-        <h2 className="text-4xl font-bold text-primary mb-16 transition-all duration-1000">
+        <h2 className="text-4xl font-bold text-primary mb-16 transition-all duration-1000 min-w-[200px] text-center">
           {phase}...
         </h2>
 
         <div className="w-full max-w-sm space-y-6">
-          <Card className="p-6 rounded-[24px] bg-slate-50 border-none flex gap-4 items-start shadow-sm">
+          <Card className="p-6 rounded-[24px] bg-slate-50 border-none flex gap-4 items-start shadow-sm min-h-[100px]">
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-slate-100">
               <span className="text-xl">🌿</span>
             </div>
-            <p className="text-slate-600 leading-relaxed text-sm">
-              It's completely normal to feel this way. Let's take a few deep breaths together to reset.
-            </p>
+            <div className="flex-1">
+              {loadingAi ? (
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <span className="text-xs font-medium">Finding words of calm...</span>
+                </div>
+              ) : (
+                <p className="text-slate-600 leading-relaxed text-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  {aiMessage}
+                </p>
+              )}
+            </div>
           </Card>
 
           <Button
             onClick={() => router.push('/reflect')}
-            className="w-full py-7 rounded-[20px] bg-primary hover:bg-primary/90 text-lg font-semibold shadow-xl shadow-primary/20"
+            className="w-full py-7 rounded-[20px] bg-primary hover:bg-primary/90 text-lg font-semibold shadow-xl shadow-primary/20 transition-all active:scale-95"
           >
-            Take a moment to reflect
+            Reflect on this moment
           </Button>
         </div>
       </main>
