@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -45,9 +46,14 @@ export default function ReflectPage() {
           <Menu className="w-6 h-6" />
         </Button>
         <h1 className="text-primary font-bold text-lg tracking-tight">CalmOS</h1>
-        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-          <img src="https://picsum.photos/seed/user123/100/100" alt="Profile" className="w-full h-full object-cover" />
-        </div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-primary"
+          onClick={() => router.push('/profile')}
+        >
+          <User className="w-6 h-6" />
+        </Button>
       </header>
 
       <main className="flex-1 px-6 pt-8 pb-10 max-w-lg mx-auto w-full space-y-10">

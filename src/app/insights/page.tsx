@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -8,8 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Bar, BarChart, XAxis, ResponsiveContainer, Cell } from 'recharts';
+import { useRouter } from 'next/navigation';
 
 export default function InsightsPage() {
+  const router = useRouter();
   const [logs, setLogs] = useState<AngerLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [aiInsights, setAiInsights] = useState<PersonalizedInsightsOutput | null>(null);
@@ -113,7 +116,12 @@ export default function InsightsPage() {
           <Menu className="w-6 h-6" />
         </Button>
         <h1 className="text-slate-800 font-bold text-lg tracking-tight">CalmOS</h1>
-        <Button variant="ghost" size="icon" className="text-slate-400">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="text-primary"
+          onClick={() => router.push('/profile')}
+        >
           <User className="w-6 h-6" />
         </Button>
       </header>
