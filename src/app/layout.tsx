@@ -3,8 +3,22 @@ import './globals.css';
 import { Navigation } from '@/components/Navigation';
 
 export const metadata: Metadata = {
-  title: 'CalmOS',
-  description: 'Personal AI emotional wellness assistant',
+  metadataBase: new URL('https://calm-os.vercel.app/'),
+  title: 'CalmOS - AI Emotional Wellness Assistant',
+  description: 'A private, empathetic emotional wellness companion helping you manage stress through AI insights and breathing exercises.',
+  openGraph: {
+    title: 'CalmOS',
+    description: 'Personal AI emotional wellness assistant',
+    url: 'https://calm-os.vercel.app/',
+    siteName: 'CalmOS',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CalmOS',
+    description: 'Personal AI emotional wellness assistant',
+  },
 };
 
 export default function RootLayout({
