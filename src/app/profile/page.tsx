@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { Menu, User, Download, Upload, Trash2, Save } from 'lucide-react';
+import { Menu, User, Download, Upload, Trash2, Save, Info, Sparkles, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -77,7 +77,7 @@ export default function ProfilePage() {
       try {
         const content = event.target?.result as string;
         await importData(content);
-        window.location.reload(); // Refresh to reload all state
+        window.location.reload(); 
       } catch (err) {
         toast({ variant: "destructive", title: "Import Failed", description: "Invalid data format." });
       }
@@ -107,8 +107,34 @@ export default function ProfilePage() {
       <main className="flex-1 px-6 pt-6 space-y-8 max-w-lg mx-auto w-full">
         <div className="space-y-1">
           <h2 className="text-3xl font-bold text-slate-800">Your Profile</h2>
-          <p className="text-slate-500 text-sm">The more I know, the better I can support you.</p>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            The more context you provide, the more empathetic and accurate my support becomes.
+          </p>
         </div>
+
+        {/* AI Personalization Guide */}
+        <Card className="rounded-[28px] border-none bg-blue-50/50 p-6 space-y-4 border border-blue-100/50">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Personalization Guide</span>
+          </div>
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <Lightbulb className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+              <p className="text-[13px] text-blue-700 leading-relaxed">
+                <span className="font-bold italic">Why fill this out?</span> Your counselor uses this data to tailor its advice. Mentioning "work stress" specifically helps it avoid generic wellness tips.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+              <p className="text-[13px] text-blue-700 leading-relaxed">
+                <span className="font-bold italic">Tone matters.</span> If you prefer direct feedback over gentle validation, specify "Direct and Clinical" in Communication Tone.
+              </p>
+            </div>
+          </div>
+        </Card>
 
         {/* Profile Info */}
         <section className="space-y-8">
@@ -118,10 +144,10 @@ export default function ProfilePage() {
                 <Label htmlFor="name" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Name</Label>
                 <Input 
                   id="name"
-                  placeholder="Address me as..."
+                  placeholder="e.g. Alex"
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  className="rounded-[16px] border-slate-100 bg-slate-50/50"
+                  className="rounded-[16px] border-slate-100 bg-slate-50/50 h-12"
                 />
               </div>
               <div className="space-y-2">
@@ -130,7 +156,7 @@ export default function ProfilePage() {
                   value={profile.ageGroup} 
                   onValueChange={(val) => setProfile({...profile, ageGroup: val})}
                 >
-                  <SelectTrigger className="rounded-[16px] border-slate-100 bg-slate-50/50">
+                  <SelectTrigger className="rounded-[16px] border-slate-100 bg-slate-50/50 h-12">
                     <SelectValue placeholder="Select..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -144,46 +170,58 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="goals" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Wellness Goals</Label>
+              <div className="flex justify-between items-end">
+                <Label htmlFor="goals" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Wellness Goals</Label>
+                <span className="text-[9px] text-slate-400 italic">Example: "React less to work emails"</span>
+              </div>
               <Textarea 
                 id="goals"
-                placeholder="What are you hoping to achieve? (e.g., manage work stress, be more patient...)"
+                placeholder="What are you hoping to achieve? This helps the AI set meaningful intentions with you."
                 value={profile.goals}
                 onChange={(e) => setProfile({ ...profile, goals: e.target.value })}
-                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[100px] resize-none p-4"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="triggers" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Typical Triggers</Label>
+              <div className="flex justify-between items-end">
+                <Label htmlFor="triggers" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Typical Triggers</Label>
+                <span className="text-[9px] text-slate-400 italic">Example: "Loud noises, feeling ignored"</span>
+              </div>
               <Textarea 
                 id="triggers"
-                placeholder="What usually causes intense emotions for you?"
+                placeholder="What usually causes intense emotions for you? Knowing this allows the AI to provide specific preemptive advice."
                 value={profile.triggers}
                 onChange={(e) => setProfile({ ...profile, triggers: e.target.value })}
-                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[100px] resize-none p-4"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="coping" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Current Coping Methods</Label>
+              <div className="flex justify-between items-end">
+                <Label htmlFor="coping" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Current Coping Methods</Label>
+                <span className="text-[9px] text-slate-400 italic">Example: "I walk for 5 minutes"</span>
+              </div>
               <Textarea 
                 id="coping"
-                placeholder="What do you already do that helps? (e.g., walking, breathing...)"
+                placeholder="What do you already do that helps? The AI will suggest these back to you when you're overwhelmed."
                 value={profile.copingMethods}
                 onChange={(e) => setProfile({ ...profile, copingMethods: e.target.value })}
-                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[100px] resize-none p-4"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="prefs" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Communication Tone</Label>
+              <div className="flex justify-between items-end">
+                <Label htmlFor="prefs" className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Communication Tone</Label>
+                <span className="text-[9px] text-slate-400 italic">Example: "Supportive and gentle"</span>
+              </div>
               <Textarea 
                 id="prefs"
-                placeholder="How should I talk to you? (e.g., gentle, direct, clinical, friendly...)"
+                placeholder="How should I talk to you? (e.g., direct, friendly, clinical, or like a wise mentor)"
                 value={profile.preferences}
                 onChange={(e) => setProfile({ ...profile, preferences: e.target.value })}
-                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[80px] resize-none"
+                className="rounded-[20px] border-slate-100 bg-slate-50/50 min-h-[100px] resize-none p-4"
               />
             </div>
           </div>
