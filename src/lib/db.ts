@@ -19,6 +19,7 @@ export interface UserProfile {
   triggers?: string;
   copingMethods?: string;
   preferences: string;
+  hasSeenTour?: boolean;
 }
 
 const DB_NAME = 'calmOS_db';
@@ -70,6 +71,11 @@ export async function getProfile(): Promise<UserProfile | null> {
     request.onsuccess = () => resolve(request.result || null);
     request.onerror = () => reject(request.error);
   });
+}
+
+export async function markTourAsSeen(): Promise<void> {
+  const profile = await getProfile() || { name: '', goals: '', preferences: '' };
+  await saveProfile({ ...profile, hasSeenTour: true });
 }
 
 // Anger Logs Functions

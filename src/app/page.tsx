@@ -1,12 +1,25 @@
-
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getProfile } from '@/lib/db';
+import { OnboardingTour } from '@/components/OnboardingTour';
 
 export default function Home() {
   const router = useRouter();
+  const [showTour, setShowTour] = useState(false);
+
+  useEffect(() => {
+    async function checkTour() {
+      const profile = await getProfile();
+      if (!profile || !profile.hasSeenTour) {
+        setShowTour(true);
+      }
+    }
+    checkTour();
+  }, []);
 
   const handleEmotion = (emotion: string) => {
     if (emotion === 'Angry') {
@@ -18,6 +31,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
+      
       <header className="px-6 pt-6 pb-2 flex justify-between items-center">
         <Button variant="ghost" size="icon" className="text-muted-foreground">
           <Menu className="w-6 h-6" />
@@ -34,9 +49,12 @@ export default function Home() {
       </header>
 
       <main className="flex-1 px-6 flex flex-col justify-center items-center text-center space-y-12">
-        <h2 className="text-3xl font-bold text-slate-800 leading-tight">
-          How are you feeling<br />right now?
-        </h2>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold text-slate-800 leading-tight">
+            How are you feeling<br />right now?
+          </h2>
+          <p className="text-slate-400 text-sm">Select an emotion to begin.</p>
+        </div>
 
         <div className="w-full max-w-sm space-y-4">
           <button
