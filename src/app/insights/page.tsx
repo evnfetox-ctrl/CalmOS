@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { getLogs, AngerLog } from '@/lib/db';
-import { generatePersonalizedInsights, PersonalizedInsightsOutput } from '@/ai/flows/personalized-insights-flow';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Menu, User, TrendingUp, Clock, Target } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, TrendingUp, ShieldCheck } from 'lucide-react';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 export default function InsightsPage() {
   const [logs, setLogs] = useState<AngerLog[]>([]);
-  const [aiInsights, setAiInsights] = useState<PersonalizedInsightsOutput | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +22,6 @@ export default function InsightsPage() {
       try {
         const data = await getLogs();
         setLogs(data);
-        if (data.length > 0) {
-          const insights = await generatePersonalizedInsights({
-            jsonData: JSON.stringify(data.slice(-10)), // Send last 10 logs for performance
-          });
-          setAiInsights(insights);
-        }
       } catch (err) {
         console.error("Failed to load insights", err);
       } finally {
@@ -33,84 +32,108 @@ export default function InsightsPage() {
   }, []);
 
   const stats = {
-    mostCommonTrigger: logs.reduce((acc, log) => {
+    controlRate: logs.length > 0 ? (logs.filter(l => !l.reacted).length / logs.length) * 100 : 0,
+    topTrigger: logs.reduce((acc, log) => {
       acc[log.trigger] = (acc[log.trigger] || 0) + 1;
       return acc;
     }, {} as Record<string, number>),
-    controlRate: logs.length > 0 ? (logs.filter(l => !l.reacted).length / logs.length) * 100 : 0,
   };
 
-  const topTrigger = Object.entries(stats.mostCommonTrigger)
-    .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+  const topTriggerName = Object.entries(stats.topTrigger).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+  const chartData = [
+    { day: 'M', value: 4 },
+    { day: 'T', value: 2 },
+    { day: 'W', value: 5 },
+    { day: 'T', value: 3 },
+    { day: 'F', value: 4 },
+    { day: 'S', value: 1 },
+    { day: 'S', value: 6 },
+  ];
 
   if (loading) {
     return (
-      <div className="px-6 pt-12 space-y-6">
-        <Skeleton className="h-10 w-48 mx-auto" />
-        <Skeleton className="h-64 w-full rounded-[24px]" />
-        <Skeleton className="h-64 w-full rounded-[24px]" />
+      <div className="p-6 space-y-6">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-40 w-full" />
       </div>
     );
   }
 
   return (
-    <div className="px-6 pt-12 pb-10 max-w-lg mx-auto space-y-8 animate-in fade-in duration-500">
-      <header className="text-center">
-        <h1 className="text-3xl font-bold text-foreground/90">Your Insights</h1>
-        <p className="text-muted-foreground mt-2">Patterns detected in your journey.</p>
+    <div className="min-h-screen bg-white flex flex-col pb-24">
+      <header className="px-6 pt-6 pb-2 flex justify-between items-center">
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Menu className="w-6 h-6" />
+        </Button>
+        <h1 className="text-slate-800 font-bold text-lg tracking-tight">CalmOS</h1>
+        <Button variant="ghost" size="icon" className="text-slate-400">
+          <User className="w-6 h-6" />
+        </Button>
       </header>
 
-      {logs.length === 0 ? (
-        <Card className="p-12 text-center rounded-[24px] bg-white border-black/5 shadow-sm">
-          <p className="text-lg text-muted-foreground">Log your first reflection to see patterns here.</p>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="rounded-[24px] border-none shadow-sm bg-primary/5 p-4 flex flex-col items-center text-center">
-              <TrendingUp className="text-primary w-6 h-6 mb-2" />
-              <span className="text-xs text-muted-foreground uppercase font-semibold">Common Trigger</span>
-              <span className="text-lg font-bold text-foreground/80">{topTrigger}</span>
-            </Card>
-            <Card className="rounded-[24px] border-none shadow-sm bg-secondary/10 p-4 flex flex-col items-center text-center">
-              <ShieldCheck className="text-secondary-foreground w-6 h-6 mb-2" />
-              <span className="text-xs text-muted-foreground uppercase font-semibold">Control Rate</span>
-              <span className="text-lg font-bold text-foreground/80">{stats.controlRate.toFixed(0)}%</span>
-            </Card>
-          </div>
+      <main className="flex-1 px-6 pt-6 space-y-8 max-w-lg mx-auto w-full">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-bold text-slate-800">Insights</h2>
+          <p className="text-slate-500 text-sm">A quiet look at your recent emotional patterns.</p>
+        </div>
 
-          <Card className="rounded-[32px] overflow-hidden border-none shadow-xl bg-white">
-            <CardHeader className="bg-primary/5 pb-4">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-primary" />
-                <CardTitle className="text-lg font-semibold text-primary">AI Pattern Analysis</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-6">
-              {aiInsights ? (
-                <>
-                  <div className="space-y-4">
-                    {aiInsights.insights.map((insight, idx) => (
-                      <div key={idx} className="flex gap-4 items-start">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <span className="text-primary text-xs font-bold">{idx + 1}</span>
-                        </div>
-                        <p className="text-foreground/70 leading-relaxed font-medium">{insight}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-4 rounded-[20px] bg-secondary/5 border border-secondary/20">
-                    <h4 className="text-sm font-bold text-secondary-foreground/70 uppercase mb-2">Suggestion</h4>
-                    <p className="text-foreground/80 leading-relaxed italic">{aiInsights.suggestion}</p>
-                  </div>
-                </>
-              ) : (
-                <p className="text-muted-foreground italic text-center py-4">Generating personalized analysis...</p>
-              )}
-            </CardContent>
+        {/* Circular Progress Section */}
+        <Card className="rounded-[32px] border-none bg-slate-50/50 p-8 flex flex-col items-center justify-center text-center space-y-4">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Your Control Rate</span>
+          <div className="relative w-40 h-40">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-200" />
+              <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" strokeDasharray={440} strokeDashoffset={440 - (440 * stats.controlRate) / 100} className="text-primary" strokeLinecap="round" />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-4xl font-bold text-slate-800">{stats.controlRate.toFixed(0)}%</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 rounded-full">
+            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-bold text-primary">+ 4% increase</span>
+          </div>
+        </Card>
+
+        {/* Info Grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="rounded-[24px] border-none bg-slate-50 p-5 space-y-3">
+            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+              <Target className="w-4 h-4 text-red-500" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Most common trigger</p>
+              <p className="text-lg font-bold text-slate-800 leading-tight">Work Stress</p>
+            </div>
+          </Card>
+          <Card className="rounded-[24px] border-none bg-slate-50 p-5 space-y-3">
+            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-slate-500" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-bold text-slate-400 uppercase">Most frequent time</p>
+              <p className="text-lg font-bold text-slate-800 leading-tight">2:00 PM <span className="text-xs font-normal text-slate-400 block">Afternoons</span></p>
+            </div>
           </Card>
         </div>
-      )}
+
+        {/* Weekly Intensity Chart */}
+        <Card className="rounded-[24px] border-none bg-slate-50 p-6 space-y-6">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Weekly Intensity</span>
+          <div className="h-32 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                <Bar dataKey="value" fill="#E2E8F0" radius={[4, 4, 4, 4]} />
+                {/* Active bar mock */}
+                <Bar dataKey="value" data={chartData.slice(-1)} fill="#007AFF" radius={[4, 4, 4, 4]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </main>
     </div>
   );
 }

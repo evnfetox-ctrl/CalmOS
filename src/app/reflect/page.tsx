@@ -2,23 +2,24 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Menu, User } from 'lucide-react';
 import { saveLog } from '@/lib/db';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
+const TRIGGERS = ['Delay', 'Mistake', 'Argument', 'Overwhelm', 'Expectation'];
 
 export default function ReflectPage() {
   const router = useRouter();
   const [trigger, setTrigger] = useState<string>('');
-  const [reacted, setReacted] = useState<string>('');
+  const [reacted, setReacted] = useState<boolean | null>(null);
 
   const handleSave = async () => {
-    if (!trigger || !reacted) {
+    if (!trigger || reacted === null) {
       toast({
         title: "Incomplete",
-        description: "Please select both a trigger and whether you reacted.",
+        description: "Please complete the reflection.",
         variant: "destructive"
       });
       return;
@@ -29,73 +30,90 @@ export default function ReflectPage() {
         id: crypto.randomUUID(),
         timestamp: Date.now(),
         trigger,
-        reacted: reacted === 'yes',
-      });
-      
-      toast({
-        title: "Reflection Saved",
-        description: "Your log has been stored locally.",
+        reacted,
       });
       router.push('/insights');
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Could not save your reflection.",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Could not save.", variant: "destructive" });
     }
   };
 
   return (
-    <div className="px-6 pt-12 pb-10 max-w-lg mx-auto space-y-8 animate-in fade-in duration-500">
-      <header className="text-center">
-        <h1 className="text-3xl font-bold text-foreground/90">Self Reflection</h1>
-        <p className="text-muted-foreground mt-2">Let's understand what happened.</p>
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="px-6 pt-6 pb-2 flex justify-between items-center">
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Menu className="w-6 h-6" />
+        </Button>
+        <h1 className="text-primary font-bold text-lg tracking-tight">CalmOS</h1>
+        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+          <img src="https://picsum.photos/seed/user123/100/100" alt="Profile" className="w-full h-full object-cover" />
+        </div>
       </header>
 
-      <Card className="rounded-[24px] border-black/5 shadow-sm overflow-hidden">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">What triggered this?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup value={trigger} onValueChange={setTrigger} className="grid grid-cols-1 gap-3">
-            {['Delay', 'Mistake', 'Argument', 'Other'].map((option) => (
-              <div key={option} className="flex items-center space-x-3 p-4 rounded-xl border border-black/5 bg-background/50">
-                <RadioGroupItem value={option} id={`trigger-${option}`} />
-                <Label htmlFor={`trigger-${option}`} className="flex-1 cursor-pointer text-lg">{option}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+      <main className="flex-1 px-6 pt-8 pb-10 max-w-lg mx-auto w-full space-y-10">
+        <div className="space-y-2">
+          <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Evening Reflection</span>
+          <h2 className="text-3xl font-bold text-slate-800">Let's unpack that moment.</h2>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            Taking time to process helps build emotional resilience.
+          </p>
+        </div>
 
-      <Card className="rounded-[24px] border-black/5 shadow-sm overflow-hidden">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">Did you react immediately?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup value={reacted} onValueChange={setReacted} className="grid grid-cols-2 gap-4">
-            {['yes', 'no'].map((val) => (
-              <div key={val} className="flex flex-col items-center justify-center p-6 rounded-xl border border-black/5 bg-background/50 transition-all hover:bg-white">
-                <RadioGroupItem value={val} id={`reacted-${val}`} className="sr-only" />
-                <Label
-                  htmlFor={`reacted-${val}`}
-                  className={`cursor-pointer text-xl font-bold uppercase transition-colors ${reacted === val ? 'text-primary' : 'text-muted-foreground/50'}`}
-                >
-                  {val === 'yes' ? 'Yes' : 'No'}
-                </Label>
-              </div>
+        <section className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-800">What triggered this?</h3>
+          <div className="flex flex-wrap gap-2">
+            {TRIGGERS.map((t) => (
+              <button
+                key={t}
+                onClick={() => setTrigger(t)}
+                className={cn(
+                  "px-5 py-2.5 rounded-full text-sm font-medium border transition-all",
+                  trigger === t
+                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105"
+                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                )}
+              >
+                {t}
+              </button>
             ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+          </div>
+        </section>
 
-      <Button
-        onClick={handleSave}
-        className="w-full h-14 rounded-[20px] text-lg font-semibold bg-primary shadow-lg"
-      >
-        Complete Reflection
-      </Button>
+        <section className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-800">Did you react immediately?</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => setReacted(true)}
+              className={cn(
+                "py-5 rounded-[20px] text-lg font-bold transition-all border",
+                reacted === true
+                  ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                  : "bg-white text-slate-500 border-slate-200"
+              )}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => setReacted(false)}
+              className={cn(
+                "py-5 rounded-[20px] text-lg font-bold transition-all border",
+                reacted === false
+                  ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                  : "bg-white text-slate-500 border-slate-200"
+              )}
+            >
+              No
+            </button>
+          </div>
+        </section>
+
+        <Button
+          onClick={handleSave}
+          className="w-full py-7 rounded-[20px] bg-primary hover:bg-primary/90 text-lg font-semibold shadow-xl shadow-primary/20"
+        >
+          Save reflection
+        </Button>
+      </main>
     </div>
   );
 }

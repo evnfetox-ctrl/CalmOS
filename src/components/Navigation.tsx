@@ -16,8 +16,8 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-black/5 safe-bottom z-50">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 safe-bottom z-50">
+      <div className="flex justify-around items-center h-20 max-w-lg mx-auto px-6">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -25,12 +25,14 @@ export function Navigation() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center space-y-1 w-full h-full transition-colors",
-                isActive ? "text-primary" : "text-muted-foreground"
+                "flex flex-col items-center justify-center space-y-1.5 transition-all duration-300",
+                isActive ? "text-primary scale-110" : "text-slate-300 hover:text-slate-400"
               )}
             >
-              <item.icon className="w-6 h-6" />
-              <span className="text-[10px] font-medium tracking-tight">{item.label}</span>
+              <item.icon className={cn("w-6 h-6", isActive && "stroke-[2.5px]")} />
+              <span className={cn("text-[9px] font-bold uppercase tracking-widest", !isActive && "opacity-0")}>
+                {item.label}
+              </span>
             </Link>
           );
         })}

@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 210 17% 97%; /* #F5F5F7 */
-    --foreground: 0 0% 10%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 211 100% 50%; /* #007AFF */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 182 31% 71%; /* #9ECBCD */
-    --secondary-foreground: 182 31% 20%;
-    --muted: 210 10% 90%;
-    --muted-foreground: 210 10% 40%;
-    --accent: 211 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 90%;
-    --input: 210 10% 90%;
-    --ring: 211 100% 50%;
-    --radius: 1.25rem;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
+    --radius: 1.5rem;
   }
 }
 
@@ -32,29 +32,41 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground selection:bg-primary/20;
+    @apply bg-[#F8FAFC] text-foreground selection:bg-primary/20;
     font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.5); opacity: 0.1; }
 }
 
-.animate-breathe {
-  animation: breathe 4s ease-in-out infinite;
+@keyframes breathe-core {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.animate-breathe-ring {
+  animation: breathe 8s ease-in-out infinite;
+}
+
+.animate-breathe-core {
+  animation: breathe-core 8s ease-in-out infinite;
 }
 
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Hide scrollbars but keep functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
 }

@@ -2,17 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { realtimeCalmingResponse } from '@/ai/flows/realtime-calming-response-flow';
+import { Menu, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function CalmPage() {
   const router = useRouter();
   const [phase, setPhase] = useState<'Inhale' | 'Hold' | 'Exhale'>('Inhale');
-  const [aiMessage, setAiMessage] = useState<string>('Finding a moment of peace...');
-  const [showReflect, setShowReflect] = useState(false);
 
   useEffect(() => {
-    // Breathing cycle
     const phases: ('Inhale' | 'Hold' | 'Exhale')[] = ['Inhale', 'Hold', 'Exhale'];
     let current = 0;
     const interval = setInterval(() => {
@@ -20,56 +18,54 @@ export default function CalmPage() {
       setPhase(phases[current]);
     }, 4000);
 
-    // Initial AI response
-    async function loadAi() {
-      try {
-        const { response } = await realtimeCalmingResponse({ trigger: 'Sudden feeling of intense anger' });
-        setAiMessage(response);
-      } catch (err) {
-        setAiMessage("Take a deep breath. You are safe, and this feeling will pass.");
-      }
-    }
-    loadAi();
-
-    // Show reflect button after 10s
-    const timer = setTimeout(() => {
-      setShowReflect(true);
-    }, 10000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="px-6 pt-16 h-[100dvh] bg-[#F5F5F7] flex flex-col items-center text-center overflow-hidden">
-      <div className="mt-12 space-y-12 flex flex-col items-center w-full max-w-md">
-        <h2 className="text-4xl font-bold text-foreground/80 animate-pulse">{phase}...</h2>
-        
-        <div className="relative flex items-center justify-center w-64 h-64">
-          <div className="absolute w-full h-full bg-primary/20 rounded-full animate-breathe" />
-          <div className="absolute w-3/4 h-3/4 bg-primary/40 rounded-full animate-breathe [animation-delay:0.2s]" />
-          <div className="absolute w-1/2 h-1/2 bg-primary rounded-full shadow-xl animate-breathe [animation-delay:0.4s]" />
+    <div className="min-h-screen bg-white flex flex-col">
+      <header className="px-6 pt-6 pb-2 flex justify-between items-center">
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Menu className="w-6 h-6" />
+        </Button>
+        <h1 className="text-slate-800 font-bold text-lg tracking-tight">CalmOS</h1>
+        <Button variant="ghost" size="icon" className="text-primary">
+          <User className="w-6 h-6" />
+        </Button>
+      </header>
+
+      <main className="flex-1 flex flex-col items-center justify-center px-6">
+        <div className="relative flex items-center justify-center w-80 h-80 mb-12">
+          {/* Breathing Rings */}
+          <div className="absolute w-full h-full bg-primary/5 rounded-full animate-breathe-ring" />
+          <div className="absolute w-4/5 h-4/5 bg-primary/10 rounded-full animate-breathe-ring [animation-delay:1s]" />
+          <div className="absolute w-3/5 h-3/5 bg-primary/20 rounded-full animate-breathe-ring [animation-delay:2s]" />
+          
+          {/* Core Circle */}
+          <div className="w-1/3 h-1/3 bg-primary rounded-full shadow-2xl z-10 animate-breathe-core" />
         </div>
 
-        <div className="px-4 py-8 bg-white/50 backdrop-blur-sm rounded-[24px] shadow-sm border border-black/5 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <p className="text-lg font-medium text-foreground/70 leading-relaxed italic">
-            "{aiMessage}"
-          </p>
-        </div>
+        <h2 className="text-4xl font-bold text-primary mb-16 transition-all duration-1000">
+          {phase}...
+        </h2>
 
-        {showReflect && (
-          <div className="mt-auto pb-12 w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <Button
-              onClick={() => router.push('/reflect')}
-              className="w-full h-14 rounded-[20px] text-lg font-semibold bg-primary hover:bg-primary/90 transition-all shadow-lg"
-            >
-              Reflect on this
-            </Button>
-          </div>
-        )}
-      </div>
+        <div className="w-full max-w-sm space-y-6">
+          <Card className="p-6 rounded-[24px] bg-slate-50 border-none flex gap-4 items-start shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 border border-slate-100">
+              <span className="text-xl">🌿</span>
+            </div>
+            <p className="text-slate-600 leading-relaxed text-sm">
+              It's completely normal to feel this way. Let's take a few deep breaths together to reset.
+            </p>
+          </Card>
+
+          <Button
+            onClick={() => router.push('/reflect')}
+            className="w-full py-7 rounded-[20px] bg-primary hover:bg-primary/90 text-lg font-semibold shadow-xl shadow-primary/20"
+          >
+            Take a moment to reflect
+          </Button>
+        </div>
+      </main>
     </div>
   );
 }
