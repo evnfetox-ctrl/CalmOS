@@ -1,37 +1,22 @@
+
 'use server';
 /**
- * @fileOverview A Genkit flow for an AI emotional counselor chat.
- *
- * - aiChatCounselor - A function that handles the AI chat counselor interaction.
- * - AIChatCounselorInput - The input type for the aiChatCounselor function.
- * - AIChatCounselorOutput - The return type for the aiChatCounselor function.
+ * @fileOverview A Genkit flow for an AI emotional counselor chat using the unified AI router.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import { aiRouterRequest } from '@/lib/ai-router';
 
 const AIChatCounselorInputSchema = z
   .string()
-  .describe('The user\u0027s message to the AI counselor.');
+  .describe('The user\'s message to the AI counselor.');
 export type AIChatCounselorInput = z.infer<typeof AIChatCounselorInputSchema>;
 
 const AIChatCounselorOutputSchema = z
   .string()
-  .describe('The AI counselor\u0027s empathetic response.');
+  .describe('The AI counselor\'s empathetic response.');
 export type AIChatCounselorOutput = z.infer<typeof AIChatCounselorOutputSchema>;
-
-const aiChatCounselorPrompt = ai.definePrompt({
-  name: 'aiChatCounselorPrompt',
-  input: {schema: AIChatCounselorInputSchema},
-  output: {schema: AIChatCounselorOutputSchema},
-  prompt: `You are a supportive emotional counselor.
-User says: {{{input}}}
-Respond:
-- Reflect emotion
-- Validate feeling
-- Ask 1 gentle question
-Keep response short (2\u002D3 lines).`,
-});
 
 const aiChatCounselorFlow = ai.defineFlow(
   {
@@ -39,9 +24,12 @@ const aiChatCounselorFlow = ai.defineFlow(
     inputSchema: AIChatCounselorInputSchema,
     outputSchema: AIChatCounselorOutputSchema,
   },
-  async input => {
-    const {output} = await aiChatCounselorPrompt(input);
-    return output!;
+  async (input) => {
+    const response = await aiRouterRequest({
+      system: "You are a supportive emotional counselor. Reflect emotion, validate feelings, and ask 1 gentle question. Keep response short (2-3 lines).",
+      prompt: input,
+    });
+    return response;
   }
 );
 
